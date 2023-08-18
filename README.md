@@ -16,3 +16,4 @@
 - [ ] "How to" guide
 - [ ] Better CLI experience
 - [ ] Setup test project
+- [ ] Make functionality to get all queues and/or topics with deadletter messages
