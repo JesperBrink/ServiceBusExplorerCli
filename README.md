@@ -15,3 +15,4 @@
 ## TODOs - General
 - [ ] "How to" guide
 - [ ] Better CLI experience
+- [ ] Setup test project
