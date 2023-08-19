@@ -1,5 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
+using Azure.Messaging.ServiceBus;
+using Exceptions;
 
 public class ServiceBusService : IServiceBusService
 {
@@ -22,6 +24,21 @@ public class ServiceBusService : IServiceBusService
     }
 
     public IReadOnlyList<string> GetQueueNames() => queueNames;
+
+    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessagesInQueue(
+        string queueName,
+        int noOfMessages
+    )
+    {
+        if (!receiverLookUp.TryGetValue(queueName, out var receiver))
+        {
+            throw new NotFoundException(
+                $"No ServiceBusReceiver was found for queue named '{queueName}'."
+            );
+        }
+
+        return await receiver.PeekMessagesAsync(noOfMessages);
+    }
 
     private async Task<IReadOnlyList<string>> RetrieveQueueNames()
     {
