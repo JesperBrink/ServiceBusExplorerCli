@@ -4,13 +4,14 @@
 - [x] Retrieve list of all queues
 - [x] Retrieve list of messages in queue
 - [x] Retrieve list of deadletter messages in queue
-- [ ] Resubmit deadletter message
+- [x] Resubmit deadletter messages
 
 ## TODOs - Topics:
 - [ ] Retrieve list of all topics 
 - [ ] Retrieve list of messages in topic 
 - [ ] Retrieve list of deadletter messages in topic
-- [ ] Resubmit deadletter message
+- [ ] Resubmit deadletter messages (avoid to resubmit to entire topic. Only to specific subscription.)
+
 
 ## TODOs - General
 - [ ] "How to" guide
