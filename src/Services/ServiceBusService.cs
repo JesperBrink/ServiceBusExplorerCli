@@ -54,7 +54,7 @@ public class ServiceBusService : IServiceBusService
         }
 
         return await receiver.PeekMessagesAsync(noOfMessages);
-    } 
+    }
 
     private async Task<IReadOnlyList<string>> RetrieveQueueNames()
     {

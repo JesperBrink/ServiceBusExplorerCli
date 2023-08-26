@@ -18,7 +18,7 @@ foreach (var queueName in queueNames)
     {
         Console.WriteLine(message.Body);
     }
-    
+
     Console.WriteLine();
 
     var dlqMessages = await serviceBusService.PeekDeadLetterMessagesInQueue(queueName, 10);
