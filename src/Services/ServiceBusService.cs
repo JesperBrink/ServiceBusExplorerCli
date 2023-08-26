@@ -40,6 +40,22 @@ public class ServiceBusService : IServiceBusService
         return await receiver.PeekMessagesAsync(noOfMessages);
     }
 
+    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessagesInQueue(
+        string queueName,
+        int noOfMessages
+    )
+    {
+        var deadLetterQueueName = $"{queueName}/$deadletterqueue";
+        if (!receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
+        {
+            throw new NotFoundException(
+                $"No ServiceBusReceiver was found for queue named '{deadLetterQueueName}'."
+            );
+        }
+
+        return await receiver.PeekMessagesAsync(noOfMessages);
+    }
+
     private async Task<IReadOnlyList<string>> RetrieveQueueNames()
     {
         var queues = await managementClient.GetQueuesAsync();
@@ -55,8 +71,13 @@ public class ServiceBusService : IServiceBusService
         foreach (var queue in queues)
         {
             var options = new ServiceBusReceiverOptions();
+
             var recevier = serviceBusClient.CreateReceiver(queue, options);
             receiverLookUp.Add(queue, recevier);
+
+            var deadLetterQueue = $"{queue}/$deadletterqueue";
+            var deadLetterRecevier = serviceBusClient.CreateReceiver(deadLetterQueue, options);
+            receiverLookUp.Add(deadLetterQueue, deadLetterRecevier);
         }
 
         return receiverLookUp;

@@ -8,4 +8,8 @@ public interface IServiceBusService
         string queueName,
         int noOfMessages
     );
+    public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessagesInQueue(
+        string queueName,
+        int noOfMessages
+    );
 }
