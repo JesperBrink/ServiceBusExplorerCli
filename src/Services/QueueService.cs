@@ -3,7 +3,7 @@ using Microsoft.Azure.ServiceBus.Management;
 using Azure.Messaging.ServiceBus;
 using Exceptions;
 
-public class ServiceBusService : IServiceBusService
+public class QueueService : IQueueService
 {
     ServiceBusClient serviceBusClient;
     ManagementClient managementClient;
@@ -12,7 +12,7 @@ public class ServiceBusService : IServiceBusService
         new Dictionary<string, ServiceBusReceiver>();
     IDictionary<string, ServiceBusSender> senderLookUp = new Dictionary<string, ServiceBusSender>();
 
-    public ServiceBusService(string serviceBusConnectionString)
+    public QueueService(string serviceBusConnectionString)
     {
         this.serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
         this.managementClient = new ManagementClient(serviceBusConnectionString);
@@ -27,7 +27,7 @@ public class ServiceBusService : IServiceBusService
 
     public IReadOnlyList<string> GetQueueNames() => queueNames;
 
-    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessagesInQueue(
+    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
         string queueName,
         int noOfMessages
     )
@@ -36,7 +36,7 @@ public class ServiceBusService : IServiceBusService
         return await receiver.PeekMessagesAsync(noOfMessages);
     }
 
-    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessagesInQueue(
+    public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessages(
         string queueName,
         int noOfMessages
     )

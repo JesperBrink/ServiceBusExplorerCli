@@ -1,14 +1,14 @@
 using Azure.Messaging.ServiceBus;
 
-public interface IServiceBusService
+public interface IQueueService
 {
     public Task Setup();
     public IReadOnlyList<string> GetQueueNames();
-    public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessagesInQueue(
+    public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
         string queueName,
         int noOfMessages
     );
-    public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessagesInQueue(
+    public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessages(
         string queueName,
         int noOfMessages
     );

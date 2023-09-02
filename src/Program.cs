@@ -1,18 +1,16 @@
 ﻿// using Service.ServiceBusService;
 
-var connectionString = "<connectionString>"
-var serviceBusService = new ServiceBusService(connectionString);
+var queueService = new QueueService(connectionString);
+Console.WriteLine("QueueService initiated");
 
-Console.WriteLine("ServiceBusService initiated");
-
-await serviceBusService.Setup();
-var queueNames = serviceBusService.GetQueueNames();
+await queueService.Setup();
+var queueNames = queueService.GetQueueNames();
 
 foreach (var queueName in queueNames)
 {
     Console.WriteLine($"Queue: {queueName}\n");
 
-    var messages = await serviceBusService.PeekMessagesInQueue(queueName, 10);
+    var messages = await queueService.PeekMessages(queueName, 10);
     Console.WriteLine($"Number of messages in queue: {messages.Count}");
     foreach (var message in messages)
     {
@@ -21,7 +19,7 @@ foreach (var queueName in queueNames)
 
     Console.WriteLine();
 
-    var dlqMessages = await serviceBusService.PeekDeadLetterMessagesInQueue(queueName, 10);
+    var dlqMessages = await queueService.PeekDeadLetterMessages(queueName, 10);
     Console.WriteLine($"Number of messages in DeadletterQueue: {dlqMessages.Count}");
     foreach (var message in dlqMessages)
     {
