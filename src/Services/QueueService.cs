@@ -1,6 +1,5 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
-using Azure.Messaging.ServiceBus;
 using Exceptions;
 
 public class QueueService : IQueueService
@@ -21,8 +20,8 @@ public class QueueService : IQueueService
     public async Task Setup()
     {
         queueNames = await RetrieveQueueNames();
-        receiverLookUp = await CreateReceivers(queueNames);
-        senderLookUp = await CreateSenders(queueNames);
+        receiverLookUp = CreateReceivers(queueNames);
+        senderLookUp = CreateSenders(queueNames);
     }
 
     public IReadOnlyList<string> GetQueueNames() => queueNames;
@@ -111,9 +110,7 @@ public class QueueService : IQueueService
         return queues.Select(q => q.Path).ToList();
     }
 
-    private async Task<IDictionary<string, ServiceBusReceiver>> CreateReceivers(
-        IReadOnlyList<string> queues
-    )
+    private IDictionary<string, ServiceBusReceiver> CreateReceivers(IReadOnlyList<string> queues)
     {
         var receiverLookUp = new Dictionary<string, ServiceBusReceiver>();
 
@@ -132,9 +129,7 @@ public class QueueService : IQueueService
         return receiverLookUp;
     }
 
-    private async Task<IDictionary<string, ServiceBusSender>> CreateSenders(
-        IReadOnlyList<string> queues
-    )
+    private IDictionary<string, ServiceBusSender> CreateSenders(IReadOnlyList<string> queues)
     {
         var senderLookUp = new Dictionary<string, ServiceBusSender>();
 
