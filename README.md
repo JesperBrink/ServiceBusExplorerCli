@@ -18,3 +18,4 @@
 - [ ] Better CLI experience
 - [ ] Setup test project
 - [ ] Make functionality to get all queues and/or topics with deadletter messages
+- [ ] When resubmitting deadletters, it should be possible to generate a new id for the message.

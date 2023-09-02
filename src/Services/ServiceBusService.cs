@@ -56,8 +56,7 @@ public class ServiceBusService : IServiceBusService
         var receiver = GetDeadLetterReceiverOrThrow(queueName);
         var sender = GetSenderOrThrow(queueName);
 
-        IReadOnlyList<ServiceBusReceivedMessage> deadLetterMessages =
-            await receiver.ReceiveMessagesAsync(fetchCount, maxWaitTime);
+        var deadLetterMessages = await receiver.ReceiveMessagesAsync(fetchCount, maxWaitTime);
 
         foreach (var message in deadLetterMessages)
         {
