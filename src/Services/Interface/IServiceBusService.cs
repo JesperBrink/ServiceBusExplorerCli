@@ -12,4 +12,9 @@ public interface IServiceBusService
         string queueName,
         int noOfMessages
     );
+    public Task ResubmitDeadLetterMessages(
+        string queueName,
+        int fetchCount,
+        TimeSpan? maxWaitTime = null
+    );
 }
