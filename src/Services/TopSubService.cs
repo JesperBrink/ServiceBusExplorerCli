@@ -1,21 +1,23 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
-using Exceptions;
+
+namespace ServiceBusExplorerCli.Services;
 
 public class TopSubService : ITopSubService
 {
-    ServiceBusClient serviceBusClient;
-    ManagementClient managementClient;
-    IDictionary<string, IReadOnlyList<string>> topicToSubscriptions =
+    private readonly ServiceBusClient serviceBusClient;
+    private readonly ManagementClient managementClient;
+    private IDictionary<string, IReadOnlyList<string>> topicToSubscriptions =
         new Dictionary<string, IReadOnlyList<string>>();
-    IDictionary<string, ServiceBusReceiver> receiverLookUp =
+    private IDictionary<string, ServiceBusReceiver> receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
-    IDictionary<string, ServiceBusSender> senderLookUp = new Dictionary<string, ServiceBusSender>();
+    private IDictionary<string, ServiceBusSender> senderLookUp =
+        new Dictionary<string, ServiceBusSender>();
 
     public TopSubService(string serviceBusConnectionString)
     {
-        this.serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        this.managementClient = new ManagementClient(serviceBusConnectionString);
+        serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        managementClient = new ManagementClient(serviceBusConnectionString);
     }
 
     public async Task Setup()
@@ -92,10 +94,10 @@ public class TopSubService : ITopSubService
                 receiverLookUp.Add(topicSubscriptionPath, receiver);
 
                 var topicSubscriptionDeadLetterPath = $"{topicSubscriptionPath}/$deadletterqueue";
-                var deadLetterRecevier = serviceBusClient.CreateReceiver(
+                var deadLetterReceiver = serviceBusClient.CreateReceiver(
                     topicSubscriptionDeadLetterPath
                 );
-                receiverLookUp.Add(topicSubscriptionDeadLetterPath, deadLetterRecevier);
+                receiverLookUp.Add(topicSubscriptionDeadLetterPath, deadLetterReceiver);
             }
         }
 
@@ -106,15 +108,15 @@ public class TopSubService : ITopSubService
         IDictionary<string, IReadOnlyList<string>> topicToSubscriptions
     )
     {
-        var senderLookUp = new Dictionary<string, ServiceBusSender>();
+        var lookUp = new Dictionary<string, ServiceBusSender>();
 
         foreach (var topicName in topicToSubscriptions.Keys)
         {
             var sender = serviceBusClient.CreateSender(topicName);
-            senderLookUp.Add(topicName, sender);
+            lookUp.Add(topicName, sender);
         }
 
-        return senderLookUp;
+        return lookUp;
     }
 
     private string GetTopicSubscriptionPath(string topicName, string subscriptionName)

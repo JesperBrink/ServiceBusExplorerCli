@@ -1,20 +1,23 @@
 using Azure.Messaging.ServiceBus;
-using Microsoft.Azure.ServiceBus.Management;
 using Exceptions;
+using Microsoft.Azure.ServiceBus.Management;
+
+namespace ServiceBusExplorerCli.Services;
 
 public class QueueService : IQueueService
 {
-    ServiceBusClient serviceBusClient;
-    ManagementClient managementClient;
-    IReadOnlyList<string> queueNames = new List<string>();
-    IDictionary<string, ServiceBusReceiver> receiverLookUp =
+    private readonly ServiceBusClient serviceBusClient;
+    private readonly ManagementClient managementClient;
+    private IReadOnlyList<string> queueNames = new List<string>();
+    private IDictionary<string, ServiceBusReceiver> receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
-    IDictionary<string, ServiceBusSender> senderLookUp = new Dictionary<string, ServiceBusSender>();
+    private IDictionary<string, ServiceBusSender> senderLookUp =
+        new Dictionary<string, ServiceBusSender>();
 
     public QueueService(string serviceBusConnectionString)
     {
-        this.serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        this.managementClient = new ManagementClient(serviceBusConnectionString);
+        serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        managementClient = new ManagementClient(serviceBusConnectionString);
     }
 
     public async Task Setup()
@@ -112,33 +115,33 @@ public class QueueService : IQueueService
 
     private IDictionary<string, ServiceBusReceiver> CreateReceivers(IReadOnlyList<string> queues)
     {
-        var receiverLookUp = new Dictionary<string, ServiceBusReceiver>();
+        var lookUp = new Dictionary<string, ServiceBusReceiver>();
 
         foreach (var queue in queues)
         {
             var options = new ServiceBusReceiverOptions();
 
             var receiver = serviceBusClient.CreateReceiver(queue, options);
-            receiverLookUp.Add(queue, receiver);
+            lookUp.Add(queue, receiver);
 
             var deadLetterQueue = $"{queue}/$deadletterqueue";
-            var deadLetterRecevier = serviceBusClient.CreateReceiver(deadLetterQueue, options);
-            receiverLookUp.Add(deadLetterQueue, deadLetterRecevier);
+            var deadLetterReceiver = serviceBusClient.CreateReceiver(deadLetterQueue, options);
+            lookUp.Add(deadLetterQueue, deadLetterReceiver);
         }
 
-        return receiverLookUp;
+        return lookUp;
     }
 
     private IDictionary<string, ServiceBusSender> CreateSenders(IReadOnlyList<string> queues)
     {
-        var senderLookUp = new Dictionary<string, ServiceBusSender>();
+        var lookUp = new Dictionary<string, ServiceBusSender>();
 
         foreach (var queue in queues)
         {
             var sender = serviceBusClient.CreateSender(queue);
-            senderLookUp.Add(queue, sender);
+            lookUp.Add(queue, sender);
         }
 
-        return senderLookUp;
+        return lookUp;
     }
 }
