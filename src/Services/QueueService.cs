@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
-using Exceptions;
 using Microsoft.Azure.ServiceBus.Management;
+using ServiceBusExplorerCli.Exceptions;
+using ServiceBusExplorerCli.Services.Interface;
 
 namespace ServiceBusExplorerCli.Services;
 
@@ -96,7 +97,7 @@ public class QueueService : IQueueService
 
     private ServiceBusReceiver GetDeadLetterReceiverOrThrow(string queueName)
     {
-        var deadLetterQueueName = $"{queueName}/$deadletterqueue";
+        var deadLetterQueueName = GetDeadLetterQueuePath(queueName);
         if (!receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
         {
             throw new NotFoundException(
@@ -124,7 +125,7 @@ public class QueueService : IQueueService
             var receiver = serviceBusClient.CreateReceiver(queue, options);
             lookUp.Add(queue, receiver);
 
-            var deadLetterQueue = $"{queue}/$deadletterqueue";
+            var deadLetterQueue = GetDeadLetterQueuePath(queue);
             var deadLetterReceiver = serviceBusClient.CreateReceiver(deadLetterQueue, options);
             lookUp.Add(deadLetterQueue, deadLetterReceiver);
         }
@@ -143,5 +144,10 @@ public class QueueService : IQueueService
         }
 
         return lookUp;
+    }
+
+    private static string GetDeadLetterQueuePath(string queueName)
+    {
+        return $"{queueName}/$deadletterqueue";
     }
 }

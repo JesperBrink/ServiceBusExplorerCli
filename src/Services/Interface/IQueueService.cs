@@ -1,5 +1,7 @@
 using Azure.Messaging.ServiceBus;
 
+namespace ServiceBusExplorerCli.Services.Interface;
+
 public interface IQueueService
 {
     public Task Setup();

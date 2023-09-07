@@ -1,9 +1,11 @@
 using Azure.Messaging.ServiceBus;
 
-public interface ITopSubService
+namespace ServiceBusExplorerCli.Services.Interface;
+
+public interface IPubSubService
 {
     public Task Setup();
-    public IReadOnlyList<string> GetTopicsAndSubscriptionNames();
+    public IDictionary<string, IReadOnlyList<string>> GetTopicsAndSubscriptionNames();
     public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
         string topicName,
         string subscriptionName,
