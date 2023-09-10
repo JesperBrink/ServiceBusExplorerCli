@@ -2,20 +2,23 @@ using Azure.Messaging.ServiceBus;
 
 namespace ServiceBusExplorerCli.Services.Interface;
 
-public interface IQueueService
+public interface IPubSubService
 {
     public Task Setup();
-    public IReadOnlyList<string> GetQueueNames();
+    public IDictionary<string, IReadOnlyList<string>> GetTopicsAndSubscriptionNames();
     public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
-        string queueName,
+        string topicName,
+        string subscriptionName,
         int noOfMessages
     );
     public Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekDeadLetterMessages(
-        string queueName,
+        string topicName,
+        string subscriptionName,
         int noOfMessages
     );
     public Task ResubmitDeadLetterMessages(
-        string queueName,
+        string topicName,
+        string subscriptionName,
         int fetchCount,
         TimeSpan? maxWaitTime = null
     );

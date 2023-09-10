@@ -1,4 +1,4 @@
-namespace Exceptions;
+namespace ServiceBusExplorerCli.Exceptions;
 
 public class NotFoundException : Exception
 {

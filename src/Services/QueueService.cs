@@ -1,28 +1,31 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
-using Azure.Messaging.ServiceBus;
-using Exceptions;
+using ServiceBusExplorerCli.Exceptions;
+using ServiceBusExplorerCli.Services.Interface;
+
+namespace ServiceBusExplorerCli.Services;
 
 public class QueueService : IQueueService
 {
-    ServiceBusClient serviceBusClient;
-    ManagementClient managementClient;
-    IReadOnlyList<string> queueNames = new List<string>();
-    IDictionary<string, ServiceBusReceiver> receiverLookUp =
+    private readonly ServiceBusClient serviceBusClient;
+    private readonly ManagementClient managementClient;
+    private IReadOnlyList<string> queueNames = new List<string>();
+    private IDictionary<string, ServiceBusReceiver> receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
-    IDictionary<string, ServiceBusSender> senderLookUp = new Dictionary<string, ServiceBusSender>();
+    private IDictionary<string, ServiceBusSender> senderLookUp =
+        new Dictionary<string, ServiceBusSender>();
 
     public QueueService(string serviceBusConnectionString)
     {
-        this.serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        this.managementClient = new ManagementClient(serviceBusConnectionString);
+        serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        managementClient = new ManagementClient(serviceBusConnectionString);
     }
 
     public async Task Setup()
     {
         queueNames = await RetrieveQueueNames();
-        receiverLookUp = await CreateReceivers(queueNames);
-        senderLookUp = await CreateSenders(queueNames);
+        receiverLookUp = CreateReceivers(queueNames);
+        senderLookUp = CreateSenders(queueNames);
     }
 
     public IReadOnlyList<string> GetQueueNames() => queueNames;
@@ -94,7 +97,7 @@ public class QueueService : IQueueService
 
     private ServiceBusReceiver GetDeadLetterReceiverOrThrow(string queueName)
     {
-        var deadLetterQueueName = $"{queueName}/$deadletterqueue";
+        var deadLetterQueueName = GetDeadLetterQueuePath(queueName);
         if (!receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
         {
             throw new NotFoundException(
@@ -111,39 +114,40 @@ public class QueueService : IQueueService
         return queues.Select(q => q.Path).ToList();
     }
 
-    private async Task<IDictionary<string, ServiceBusReceiver>> CreateReceivers(
-        IReadOnlyList<string> queues
-    )
+    private IDictionary<string, ServiceBusReceiver> CreateReceivers(IReadOnlyList<string> queues)
     {
-        var receiverLookUp = new Dictionary<string, ServiceBusReceiver>();
+        var lookUp = new Dictionary<string, ServiceBusReceiver>();
 
         foreach (var queue in queues)
         {
             var options = new ServiceBusReceiverOptions();
 
             var receiver = serviceBusClient.CreateReceiver(queue, options);
-            receiverLookUp.Add(queue, receiver);
+            lookUp.Add(queue, receiver);
 
-            var deadLetterQueue = $"{queue}/$deadletterqueue";
-            var deadLetterRecevier = serviceBusClient.CreateReceiver(deadLetterQueue, options);
-            receiverLookUp.Add(deadLetterQueue, deadLetterRecevier);
+            var deadLetterQueue = GetDeadLetterQueuePath(queue);
+            var deadLetterReceiver = serviceBusClient.CreateReceiver(deadLetterQueue, options);
+            lookUp.Add(deadLetterQueue, deadLetterReceiver);
         }
 
-        return receiverLookUp;
+        return lookUp;
     }
 
-    private async Task<IDictionary<string, ServiceBusSender>> CreateSenders(
-        IReadOnlyList<string> queues
-    )
+    private IDictionary<string, ServiceBusSender> CreateSenders(IReadOnlyList<string> queues)
     {
-        var senderLookUp = new Dictionary<string, ServiceBusSender>();
+        var lookUp = new Dictionary<string, ServiceBusSender>();
 
         foreach (var queue in queues)
         {
             var sender = serviceBusClient.CreateSender(queue);
-            senderLookUp.Add(queue, sender);
+            lookUp.Add(queue, sender);
         }
 
-        return senderLookUp;
+        return lookUp;
+    }
+
+    private static string GetDeadLetterQueuePath(string queueName)
+    {
+        return $"{queueName}/$deadletterqueue";
     }
 }

@@ -7,15 +7,16 @@
 - [x] Resubmit deadletter messages
 
 ## TODOs - Topics:
-- [ ] Retrieve list of all topics 
-- [ ] Retrieve list of messages in topic 
-- [ ] Retrieve list of deadletter messages in topic
-- [ ] Resubmit deadletter messages (avoid to resubmit to entire topic. Only to specific subscription.)
-
+- [x] Retrieve list of all topics and their subscriptions
+- [x] Retrieve list of messages in topic/subscription 
+- [x] Retrieve list of deadletter messages in topic/subscription
+- [x] Resubmit deadletter messages 
 
 ## TODOs - General
+- [ ] CLI
 - [ ] "How to" guide
-- [ ] Better CLI experience
 - [ ] Setup test project
+- [ ] Make sure the CLI informs the user about the fact that resubmitting deadletters will affect ALL subscriptions in the topic.
 - [ ] Make functionality to get all queues and/or topics with deadletter messages
 - [ ] When resubmitting deadletters, it should be possible to generate a new id for the message.
+- [ ] Investigate possibility of avoiding to resubmit to all subscriptions in a topic, then resubmitting deadletter messages.

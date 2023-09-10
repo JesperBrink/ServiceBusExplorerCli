@@ -1,4 +1,6 @@
-﻿// using Service.ServiceBusService;
+﻿using ServiceBusExplorerCli.Services;
+
+var connectionString = "";
 
 var queueService = new QueueService(connectionString);
 Console.WriteLine("QueueService initiated");
