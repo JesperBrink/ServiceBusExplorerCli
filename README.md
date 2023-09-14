@@ -1,22 +1,14 @@
 # ServiceBusExplorerCli
 
-## TODOs - Queue:
-- [x] Retrieve list of all queues
-- [x] Retrieve list of messages in queue
-- [x] Retrieve list of deadletter messages in queue
-- [x] Resubmit deadletter messages
+WIP!
 
-## TODOs - Topics:
-- [x] Retrieve list of all topics and their subscriptions
-- [x] Retrieve list of messages in topic/subscription 
-- [x] Retrieve list of deadletter messages in topic/subscription
-- [x] Resubmit deadletter messages 
+This project is a small and simple tool for interacting with [Azure Service Bus](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messaging-overview). The purpose is not to have all the same features as [Service Bus Explorer](https://github.com/paolosalvatori/ServiceBusExplorer), but instead to be a simple alternative with a few essential features for interacting with Azure Service Bus. (Well, actually I just really like using the terminal, so why use a GUI when you could use a CLI!).
 
-## TODOs - General
-- [ ] CLI
-- [ ] "How to" guide
-- [ ] Setup test project
-- [ ] Make sure the CLI informs the user about the fact that resubmitting deadletters will affect ALL subscriptions in the topic.
-- [ ] Make functionality to get all queues and/or topics with deadletter messages
-- [ ] When resubmitting deadletters, it should be possible to generate a new id for the message.
-- [ ] Investigate possibility of avoiding to resubmit to all subscriptions in a topic, then resubmitting deadletter messages.
+## Supported commands
+- [x] List the names of all queues or topics
+- [ ] List the names of all the subscriptions in a topic
+- [ ] List all queus/subscriptions with messages in their DeadLetterQueue.
+- [ ] Peek messages
+- [ ] Peek deadletter messages
+- [ ] Resubmit deadletter messages
+      
