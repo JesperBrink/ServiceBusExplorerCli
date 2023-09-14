@@ -72,8 +72,6 @@ public class PubSubService : IPubSubService
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }
-
-        await receiver.CloseAsync();
     }
 
     private ServiceBusSender GetSenderOrThrow(string topicName)
