@@ -1,6 +1,8 @@
 using System.Text.Json;
 using ServiceBusExplorerCli.Models;
 
+namespace ServiceBusExplorerCli.Util;
+
 public static class ConnectionConfigUtil
 {
     private const string ConnectionConfigPath = ".serviceBusExplorerCliConfig";
@@ -18,13 +20,8 @@ public static class ConnectionConfigUtil
         }
 
         Console.WriteLine("Choose between the following configs:");
-        for (var i = 0; i < configs.Count; i++)
-        {
-            Console.WriteLine($"{i}: {configs[i].Name}");
-        }
-
-        Console.Write("Enter id of config: ");
-        var chosenIndex = int.Parse(Console.ReadLine());
+        PromtUtil.WriteIndexedList(configs.Select(x => x.Name).ToList());
+        var chosenIndex = int.Parse(PromtUtil.GetInput("Enter id of config: "));
 
         return configs[chosenIndex];
     }
