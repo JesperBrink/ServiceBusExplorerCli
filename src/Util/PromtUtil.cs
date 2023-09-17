@@ -18,20 +18,34 @@ public static class PromtUtil
         }
     }
 
-    public static int GetIntInput(string? messageToUser)
+    public static int GetIntInput(
+        string? messageToUser,
+        int minAllowedInput = 0,
+        int maxAllowedInput = int.MaxValue
+    )
     {
         Console.Write(messageToUser);
 
         do
         {
             var rawInputFromUser = Console.ReadLine();
-            if (int.TryParse(rawInputFromUser, out int intInputFromUser))
+            if (!int.TryParse(rawInputFromUser, out int intInputFromUser))
             {
-                return intInputFromUser;
+                Console.WriteLine("Sorry, but the input must be an integer.");
+                Console.Write("Try again: ");
+                continue;
             }
 
-            Console.WriteLine("Sorry, but the input must be an integer.");
-            Console.Write("Try again: ");
+            if (intInputFromUser < minAllowedInput || intInputFromUser > maxAllowedInput)
+            {
+                Console.WriteLine(
+                    $"Sorry, but the input must be in the range {minAllowedInput} to {maxAllowedInput}."
+                );
+                Console.Write("Try again: ");
+                continue;
+            }
+
+            return intInputFromUser;
         } while (true);
     }
 }

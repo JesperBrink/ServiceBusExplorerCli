@@ -22,7 +22,10 @@ public class ListSubscriptionsInTopicsCommand : ICommand
         var topics = topicsAndSubscriptionNames.Keys.ToList();
         PromtUtil.WriteIndexedList(topics);
 
-        var chosenIndex = PromtUtil.GetIntInput("Index of topic to choose: ");
+        var chosenIndex = PromtUtil.GetIntInput(
+            "Index of topic to choose: ",
+            maxAllowedInput: topics.Count - 1
+        );
         var topicName = topics[chosenIndex];
         PromtUtil.WriteList(topicsAndSubscriptionNames[topicName].ToList());
     }
