@@ -21,7 +21,7 @@ public static class ConnectionConfigUtil
 
         Console.WriteLine("Choose between the following configs:");
         PromtUtil.WriteIndexedList(configs.Select(x => x.Name).ToList());
-        var chosenIndex = int.Parse(PromtUtil.GetInput("Enter id of config: "));
+        var chosenIndex = PromtUtil.GetIntInput("Enter id of config: ");
 
         return configs[chosenIndex];
     }

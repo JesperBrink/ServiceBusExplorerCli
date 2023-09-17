@@ -20,7 +20,7 @@ public class CliService : ICliService
         {
             Console.WriteLine("The following commands are possible:");
             PromtUtil.WriteIndexedList(commandTitles);
-            var chosenIndex = int.Parse(PromtUtil.GetInput("Index of operation to perform: "));
+            var chosenIndex = PromtUtil.GetIntInput("Index of operation to perform: ");
             commands[chosenIndex].Execute();
             Console.WriteLine();
         }
