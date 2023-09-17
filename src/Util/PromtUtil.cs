@@ -18,6 +18,23 @@ public static class PromtUtil
         }
     }
 
+    public static string GetStringInput(string? messageToUser)
+    {
+        Console.Write(messageToUser);
+        do
+        {
+            var rawInputFromUser = Console.ReadLine();
+            if (string.IsNullOrEmpty(rawInputFromUser))
+            {
+                Console.WriteLine("Sorry, but the input cannot be empty.");
+                Console.Write("Try again: ");
+                continue;
+            }
+
+            return rawInputFromUser;
+        } while (true);
+    }
+
     public static int GetIntInput(
         string? messageToUser,
         int minAllowedInput = 0,
