@@ -18,9 +18,20 @@ public static class PromtUtil
         }
     }
 
-    public static string? GetInput(string? messageToUser)
+    public static int GetIntInput(string? messageToUser)
     {
         Console.Write(messageToUser);
-        return Console.ReadLine();
+
+        do
+        {
+            var rawInputFromUser = Console.ReadLine();
+            if (int.TryParse(rawInputFromUser, out int intInputFromUser))
+            {
+                return intInputFromUser;
+            }
+
+            Console.WriteLine("Sorry, but the input must be an integer.");
+            Console.Write("Try again: ");
+        } while (true);
     }
 }

@@ -21,8 +21,8 @@ public class ListSubscriptionsInTopicsCommand : ICommand
         var topicsAndSubscriptionNames = _pubService.GetTopicsAndSubscriptionNames();
         var topics = topicsAndSubscriptionNames.Keys.ToList();
         PromtUtil.WriteIndexedList(topics);
-        
-        var chosenIndex = int.Parse(PromtUtil.GetInput("Index of topic to choose: "));
+
+        var chosenIndex = PromtUtil.GetIntInput("Index of topic to choose: ");
         var topicName = topics[chosenIndex];
         PromtUtil.WriteList(topicsAndSubscriptionNames[topicName].ToList());
     }

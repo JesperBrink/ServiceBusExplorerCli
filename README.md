@@ -6,7 +6,7 @@ This project is a small and simple tool for interacting with [Azure Service Bus]
 
 ## Supported commands
 - [x] List the names of all queues or topics
-- [ ] List the names of all the subscriptions in a topic
+- [x] List the names of all the subscriptions in a topic
 - [ ] List all queus/subscriptions with messages in their DeadLetterQueue.
 - [ ] Peek messages
 - [ ] Peek deadletter messages
