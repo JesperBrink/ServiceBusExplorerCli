@@ -33,11 +33,8 @@ public static class ConnectionConfigUtil
     {
         Console.WriteLine("Creating a new connection config.");
 
-        Console.Write("Name: ");
-        var name = Console.ReadLine();
-
-        Console.Write("ConnectionString: ");
-        var connectionString = Console.ReadLine();
+        var name = PromtUtil.GetStringInput("Name: ");
+        var connectionString = PromtUtil.GetStringInput("ConnectionString: ");
 
         return new ConnectionConfig(name, connectionString);
     }
