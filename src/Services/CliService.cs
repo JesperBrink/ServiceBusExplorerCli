@@ -34,6 +34,11 @@ public class CliService : ICliService
         var pubSubService = new PubSubService(connectionConfig.ConnectionString);
         await pubSubService.Setup();
 
-        return new List<ICommand> { new ListQueuesCommand(queueService) };
+        return new List<ICommand>
+        {
+            new ListQueuesCommand(queueService),
+            new ListTopicsCommand(pubSubService),
+            new ListSubscriptionsInTopicsCommand(pubSubService)
+        };
     }
 }
