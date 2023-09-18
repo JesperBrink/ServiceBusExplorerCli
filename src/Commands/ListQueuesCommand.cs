@@ -16,9 +16,11 @@ public class ListQueuesCommand : ICommand
         Title = "List all queues";
     }
 
-    public void Execute()
+    public Task Execute()
     {
         var queueNames = _queueService.GetQueueNames();
         PromtUtil.WriteList(queueNames.ToList());
+
+        return Task.CompletedTask;
     }
 }

@@ -16,7 +16,7 @@ public class ListSubscriptionsInTopicsCommand : ICommand
         Title = "List all subscriptions in a topic";
     }
 
-    public void Execute()
+    public Task Execute()
     {
         var topicsAndSubscriptionNames = _pubService.GetTopicsAndSubscriptionNames();
         var topics = topicsAndSubscriptionNames.Keys.ToList();
@@ -28,5 +28,7 @@ public class ListSubscriptionsInTopicsCommand : ICommand
         );
         var topicName = topics[chosenIndex];
         PromtUtil.WriteList(topicsAndSubscriptionNames[topicName].ToList());
+
+        return Task.CompletedTask;
     }
 }
