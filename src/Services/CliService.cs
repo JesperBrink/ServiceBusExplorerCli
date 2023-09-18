@@ -24,7 +24,7 @@ public class CliService : ICliService
                 "Index of operation to perform: ",
                 maxAllowedInput: commands.Count - 1
             );
-            commands[chosenIndex].Execute();
+            await commands[chosenIndex].Execute();
             Console.WriteLine();
         }
     }
@@ -41,7 +41,8 @@ public class CliService : ICliService
         {
             new ListQueuesCommand(queueService),
             new ListTopicsCommand(pubSubService),
-            new ListSubscriptionsInTopicsCommand(pubSubService)
+            new ListSubscriptionsInTopicsCommand(pubSubService),
+            new ListDeadLetterQueuesWithMessagesCommand(queueService, pubSubService)
         };
     }
 }

@@ -16,9 +16,11 @@ public class ListTopicsCommand : ICommand
         Title = "List all topics";
     }
 
-    public void Execute()
+    public Task Execute()
     {
         var topicsAndSubscriptionNames = _pubService.GetTopicsAndSubscriptionNames();
         PromtUtil.WriteList(topicsAndSubscriptionNames.Keys.ToList());
+
+        return Task.CompletedTask;
     }
 }
