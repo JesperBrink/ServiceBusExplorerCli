@@ -18,6 +18,8 @@ public class ListSubscriptionsInTopicsCommand : ICommand
 
     public Task Execute()
     {
+        Console.WriteLine("List of all topics:");
+
         var topicsAndSubscriptionNames = _pubService.GetTopicsAndSubscriptionNames();
         var topics = topicsAndSubscriptionNames.Keys.ToList();
         PromtUtil.WriteIndexedList(topics);
@@ -27,6 +29,10 @@ public class ListSubscriptionsInTopicsCommand : ICommand
             maxAllowedInput: topics.Count - 1
         );
         var topicName = topics[chosenIndex];
+
+        Console.Clear();
+
+        Console.WriteLine($"List of subscriptions in {topicName}:");
         PromtUtil.WriteList(topicsAndSubscriptionNames[topicName].ToList());
 
         return Task.CompletedTask;

@@ -14,18 +14,21 @@ public class CliService : ICliService
         var commands = await IntializeCommands(connectionConfig);
         var commandTitles = commands.Select(x => x.Title).ToList();
 
-        Console.WriteLine($"Config {connectionConfig.Name} was successfully loaded.\n");
-
         while (true)
         {
+            Console.Clear();
             Console.WriteLine("The following commands are possible:");
+
             PromtUtil.WriteIndexedList(commandTitles);
             var chosenIndex = PromtUtil.GetIntInput(
                 "Index of operation to perform: ",
                 maxAllowedInput: commands.Count - 1
             );
+            
+            Console.Clear();
             await commands[chosenIndex].Execute();
-            Console.WriteLine();
+
+            PromtUtil.WaitForUserToPressEnter();
         }
     }
 

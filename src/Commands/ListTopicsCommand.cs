@@ -18,6 +18,8 @@ public class ListTopicsCommand : ICommand
 
     public Task Execute()
     {
+        Console.WriteLine("List of all topics:");
+
         var topicsAndSubscriptionNames = _pubService.GetTopicsAndSubscriptionNames();
         PromtUtil.WriteList(topicsAndSubscriptionNames.Keys.ToList());
 

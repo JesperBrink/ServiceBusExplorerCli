@@ -65,4 +65,10 @@ public static class PromtUtil
             return intInputFromUser;
         } while (true);
     }
+
+    public static void WaitForUserToPressEnter()
+    {
+        Console.WriteLine("Press enter to return to main menu.");
+        Console.ReadLine();
+    }
 }

@@ -18,6 +18,8 @@ public class ListQueuesCommand : ICommand
 
     public Task Execute()
     {
+        Console.WriteLine("List of all queues:");
+
         var queueNames = _queueService.GetQueueNames();
         PromtUtil.WriteList(queueNames.ToList());
 
