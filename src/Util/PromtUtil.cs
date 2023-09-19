@@ -2,19 +2,23 @@ namespace ServiceBusExplorerCli.Util;
 
 public static class PromtUtil
 {
-    public static void WriteIndexedList(IList<string> listToWrite)
+    public static void WriteIndexedList(IList<string> listToWrite, int indentationLevel = 2)
     {
+        var indentation = new String(' ', indentationLevel);
+
         for (var i = 0; i < listToWrite.Count; i++)
         {
-            Console.WriteLine($"{i}: {listToWrite[i]}");
+            Console.WriteLine($"{indentation}{i}: {listToWrite[i]}");
         }
     }
 
-    public static void WriteList(IList<string> listToWrite)
+    public static void WriteList(IList<string> listToWrite, int indentationLevel = 2)
     {
+        var indentation = new String(' ', indentationLevel);
+
         foreach (var element in listToWrite)
         {
-            Console.WriteLine(element);
+            Console.WriteLine($"{indentation}{element}");
         }
     }
 
