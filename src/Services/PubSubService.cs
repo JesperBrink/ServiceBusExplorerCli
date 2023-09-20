@@ -7,30 +7,30 @@ namespace ServiceBusExplorerCli.Services;
 
 public class PubSubService : IPubSubService
 {
-    private readonly ServiceBusClient serviceBusClient;
-    private readonly ManagementClient managementClient;
-    private IDictionary<string, IReadOnlyList<string>> topicToSubscriptions =
+    private readonly ServiceBusClient _serviceBusClient;
+    private readonly ManagementClient _managementClient;
+    private IDictionary<string, IReadOnlyList<string>> _topicToSubscriptions =
         new Dictionary<string, IReadOnlyList<string>>();
-    private IDictionary<string, ServiceBusReceiver> receiverLookUp =
+    private IDictionary<string, ServiceBusReceiver> _receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
-    private IDictionary<string, ServiceBusSender> senderLookUp =
+    private IDictionary<string, ServiceBusSender> _senderLookUp =
         new Dictionary<string, ServiceBusSender>();
 
     public PubSubService(string serviceBusConnectionString)
     {
-        serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        managementClient = new ManagementClient(serviceBusConnectionString);
+        _serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        _managementClient = new ManagementClient(serviceBusConnectionString);
     }
 
     public async Task Setup()
     {
-        topicToSubscriptions = await RetrieveTopicAndSubscriptionNames();
-        receiverLookUp = CreateReceivers(topicToSubscriptions);
-        senderLookUp = CreateSenders(topicToSubscriptions);
+        _topicToSubscriptions = await RetrieveTopicAndSubscriptionNames();
+        _receiverLookUp = CreateReceivers(_topicToSubscriptions);
+        _senderLookUp = CreateSenders(_topicToSubscriptions);
     }
 
     public IDictionary<string, IReadOnlyList<string>> GetTopicsAndSubscriptionNames() =>
-        topicToSubscriptions;
+        _topicToSubscriptions;
 
     public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
         string topicName,
@@ -76,7 +76,7 @@ public class PubSubService : IPubSubService
 
     private ServiceBusSender GetSenderOrThrow(string topicName)
     {
-        if (!senderLookUp.TryGetValue(topicName, out var sender))
+        if (!_senderLookUp.TryGetValue(topicName, out var sender))
         {
             throw new NotFoundException(
                 $"No ServiceBusSender was found for topic named '{topicName}'."
@@ -89,7 +89,7 @@ public class PubSubService : IPubSubService
     private ServiceBusReceiver GetReceiverOrThrow(string topicName, string subscriptionName)
     {
         var topicSubscriptionPath = GetTopicSubscriptionPath(topicName, subscriptionName);
-        if (!receiverLookUp.TryGetValue(topicSubscriptionPath, out var receiver))
+        if (!_receiverLookUp.TryGetValue(topicSubscriptionPath, out var receiver))
         {
             throw new NotFoundException(
                 $"No ServiceBusReceiver was found for topic/subscription path named '{topicSubscriptionPath}'."
@@ -105,7 +105,7 @@ public class PubSubService : IPubSubService
     )
     {
         var deadLetterQueueName = GetTopicSubscriptionDeadLetterPath(topicName, subscriptionName);
-        if (!receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
+        if (!_receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
         {
             throw new NotFoundException(
                 $"No ServiceBusReceiver was found for deadLetterQueue named '{deadLetterQueueName}'."
@@ -121,12 +121,12 @@ public class PubSubService : IPubSubService
     {
         var topicToSubscriptions = new Dictionary<string, IReadOnlyList<string>>();
 
-        var topics = await managementClient.GetTopicsAsync();
+        var topics = await _managementClient.GetTopicsAsync();
         var topicNames = topics.Select(t => t.Path).ToList();
 
         foreach (var topicName in topicNames)
         {
-            var subscriptions = await managementClient.GetSubscriptionsAsync(topicName);
+            var subscriptions = await _managementClient.GetSubscriptionsAsync(topicName);
             var subscriptionNames = subscriptions.Select(s => s.SubscriptionName).ToList();
             topicToSubscriptions[topicName] = subscriptionNames;
         }
@@ -144,7 +144,7 @@ public class PubSubService : IPubSubService
         {
             foreach (var subscriptionName in topicToSubscriptions[topicName])
             {
-                var receiver = serviceBusClient.CreateReceiver(topicName, subscriptionName);
+                var receiver = _serviceBusClient.CreateReceiver(topicName, subscriptionName);
                 var topicSubscriptionPath = GetTopicSubscriptionPath(topicName, subscriptionName);
                 lookUp.Add(topicSubscriptionPath, receiver);
 
@@ -152,7 +152,7 @@ public class PubSubService : IPubSubService
                     topicName,
                     subscriptionName
                 );
-                var deadLetterReceiver = serviceBusClient.CreateReceiver(
+                var deadLetterReceiver = _serviceBusClient.CreateReceiver(
                     topicSubscriptionDeadLetterPath
                 );
                 lookUp.Add(topicSubscriptionDeadLetterPath, deadLetterReceiver);
@@ -170,7 +170,7 @@ public class PubSubService : IPubSubService
 
         foreach (var topicName in topicToSubscriptions.Keys)
         {
-            var sender = serviceBusClient.CreateSender(topicName);
+            var sender = _serviceBusClient.CreateSender(topicName);
             lookUp.Add(topicName, sender);
         }
 
