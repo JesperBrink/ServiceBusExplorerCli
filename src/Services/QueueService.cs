@@ -7,28 +7,28 @@ namespace ServiceBusExplorerCli.Services;
 
 public class QueueService : IQueueService
 {
-    private readonly ServiceBusClient serviceBusClient;
-    private readonly ManagementClient managementClient;
-    private IReadOnlyList<string> queueNames = new List<string>();
-    private IDictionary<string, ServiceBusReceiver> receiverLookUp =
+    private readonly ServiceBusClient _serviceBusClient;
+    private readonly ManagementClient _managementClient;
+    private IReadOnlyList<string> _queueNames = new List<string>();
+    private IDictionary<string, ServiceBusReceiver> _receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
-    private IDictionary<string, ServiceBusSender> senderLookUp =
+    private IDictionary<string, ServiceBusSender> _senderLookUp =
         new Dictionary<string, ServiceBusSender>();
 
     public QueueService(string serviceBusConnectionString)
     {
-        serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        managementClient = new ManagementClient(serviceBusConnectionString);
+        _serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        _managementClient = new ManagementClient(serviceBusConnectionString);
     }
 
     public async Task Setup()
     {
-        queueNames = await RetrieveQueueNames();
-        receiverLookUp = CreateReceivers(queueNames);
-        senderLookUp = CreateSenders(queueNames);
+        _queueNames = await RetrieveQueueNames();
+        _receiverLookUp = CreateReceivers(_queueNames);
+        _senderLookUp = CreateSenders(_queueNames);
     }
 
-    public IReadOnlyList<string> GetQueueNames() => queueNames;
+    public IReadOnlyList<string> GetQueueNames() => _queueNames;
 
     public async Task<IReadOnlyList<ServiceBusReceivedMessage>> PeekMessages(
         string queueName,
@@ -73,7 +73,7 @@ public class QueueService : IQueueService
 
     private ServiceBusSender GetSenderOrThrow(string queueName)
     {
-        if (!senderLookUp.TryGetValue(queueName, out var sender))
+        if (!_senderLookUp.TryGetValue(queueName, out var sender))
         {
             throw new NotFoundException(
                 $"No ServiceBusSender was found for queue named '{queueName}'."
@@ -85,7 +85,7 @@ public class QueueService : IQueueService
 
     private ServiceBusReceiver GetReceiverOrThrow(string queueName)
     {
-        if (!receiverLookUp.TryGetValue(queueName, out var receiver))
+        if (!_receiverLookUp.TryGetValue(queueName, out var receiver))
         {
             throw new NotFoundException(
                 $"No ServiceBusReceiver was found for queue named '{queueName}'."
@@ -98,7 +98,7 @@ public class QueueService : IQueueService
     private ServiceBusReceiver GetDeadLetterReceiverOrThrow(string queueName)
     {
         var deadLetterQueueName = GetDeadLetterQueuePath(queueName);
-        if (!receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
+        if (!_receiverLookUp.TryGetValue(deadLetterQueueName, out var receiver))
         {
             throw new NotFoundException(
                 $"No ServiceBusReceiver was found for queue named '{deadLetterQueueName}'."
@@ -110,7 +110,7 @@ public class QueueService : IQueueService
 
     private async Task<IReadOnlyList<string>> RetrieveQueueNames()
     {
-        var queues = await managementClient.GetQueuesAsync();
+        var queues = await _managementClient.GetQueuesAsync();
         return queues.Select(q => q.Path).ToList();
     }
 
@@ -122,11 +122,11 @@ public class QueueService : IQueueService
         {
             var options = new ServiceBusReceiverOptions();
 
-            var receiver = serviceBusClient.CreateReceiver(queue, options);
+            var receiver = _serviceBusClient.CreateReceiver(queue, options);
             lookUp.Add(queue, receiver);
 
             var deadLetterQueue = GetDeadLetterQueuePath(queue);
-            var deadLetterReceiver = serviceBusClient.CreateReceiver(deadLetterQueue, options);
+            var deadLetterReceiver = _serviceBusClient.CreateReceiver(deadLetterQueue, options);
             lookUp.Add(deadLetterQueue, deadLetterReceiver);
         }
 
@@ -139,7 +139,7 @@ public class QueueService : IQueueService
 
         foreach (var queue in queues)
         {
-            var sender = serviceBusClient.CreateSender(queue);
+            var sender = _serviceBusClient.CreateSender(queue);
             lookUp.Add(queue, sender);
         }
 
