@@ -67,8 +67,6 @@ public class QueueService : IQueueService
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }
-
-        await receiver.CloseAsync();
     }
 
     private ServiceBusSender GetSenderOrThrow(string queueName)
