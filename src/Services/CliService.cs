@@ -47,7 +47,9 @@ public class CliService : ICliService
             new ListSubscriptionsInTopicsCommand(pubSubService),
             new ListDeadLetterQueuesWithMessagesCommand(queueService, pubSubService),
             new PeekMessagesInQueueCommand(queueService),
-            new PeekMessagesInSubscriptionCommand(pubSubService)
+            new PeekMessagesInSubscriptionCommand(pubSubService),
+            new PeekDeadLetterMessagesInQueueCommand(queueService),
+            new PeekDeadLetterMessagesInSubscriptionCommand(pubSubService)
         };
     }
 }
