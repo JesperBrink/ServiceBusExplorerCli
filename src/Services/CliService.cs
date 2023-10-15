@@ -49,7 +49,9 @@ public class CliService : ICliService
             new PeekMessagesInQueueCommand(queueService),
             new PeekMessagesInSubscriptionCommand(pubSubService),
             new PeekDeadLetterMessagesInQueueCommand(queueService),
-            new PeekDeadLetterMessagesInSubscriptionCommand(pubSubService)
+            new PeekDeadLetterMessagesInSubscriptionCommand(pubSubService),
+            new ResubmitDeadLetterMessagesInQueueCommand(queueService),
+            new ResubmitDeadLetterMessagesInSubscriptionCommand(pubSubService)
         };
     }
 }

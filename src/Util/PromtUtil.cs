@@ -70,6 +70,34 @@ public static class PromtUtil
         } while (true);
     }
 
+    public static bool GetBoolInput(string? messageToUser)
+    {
+        Console.Write($"(Y/N) {messageToUser}");
+        do
+        {
+            var rawInputFromUser = Console.ReadLine();
+            if (string.IsNullOrEmpty(rawInputFromUser))
+            {
+                Console.WriteLine("Sorry, but the input cannot be empty.");
+                Console.Write("Try again: ");
+                continue;
+            }
+
+            if (rawInputFromUser.ToLower().Equals("y") || rawInputFromUser.ToLower().Equals("yes"))
+            {
+                return true;
+            }
+
+            if (rawInputFromUser.ToLower().Equals("n") || rawInputFromUser.ToLower().Equals("no"))
+            {
+                return false;
+            }
+
+            Console.WriteLine("Sorry, but you must enter either 'yes' (y) or 'no' (n).");
+            Console.Write("Try again: ");
+        } while (true);
+    }
+
     public static void WaitForUserToPressEnter()
     {
         Console.WriteLine("Press enter to return to main menu.");
