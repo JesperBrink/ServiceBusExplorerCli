@@ -20,6 +20,7 @@ public interface IPubSubService
         string topicName,
         string subscriptionName,
         int fetchCount,
-        TimeSpan? maxWaitTime = null
+        TimeSpan? maxWaitTime = null,
+        bool createNewMessageId = false
     );
 }

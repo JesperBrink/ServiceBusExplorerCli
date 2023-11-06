@@ -51,12 +51,16 @@ public class PubSubService : IPubSubService
         var receiver = GetDeadLetterReceiverOrThrow(topicName, subscriptionName);
         return await receiver.PeekMessagesAsync(noOfMessages);
     }
+    
+    // TODO: tilføj test project, hvor jeg tester de to services.
+    // Eksempel på test: test at der resubmittes korrekt (med og uden nye ID'er).
 
     public async Task ResubmitDeadLetterMessages(
         string topicName,
         string subscriptionName,
         int fetchCount,
-        TimeSpan? maxWaitTime = null
+        TimeSpan? maxWaitTime = null,
+        bool createNewMessageId = false
     )
     {
         maxWaitTime ??= new TimeSpan(0, 0, 10);
@@ -69,6 +73,13 @@ public class PubSubService : IPubSubService
         foreach (var message in deadLetterMessages)
         {
             var resubmittableMessage = new ServiceBusMessage(message);
+
+            if (createNewMessageId)
+            {
+                var newMessageId = Guid.NewGuid();
+                resubmittableMessage.MessageId = newMessageId.ToString();
+            }
+            
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }

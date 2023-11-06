@@ -51,7 +51,8 @@ public class QueueService : IQueueService
     public async Task ResubmitDeadLetterMessages(
         string queueName,
         int fetchCount,
-        TimeSpan? maxWaitTime = null
+        TimeSpan? maxWaitTime = null,
+        bool createNewMessageId = false
     )
     {
         maxWaitTime ??= new TimeSpan(0, 0, 10);
@@ -64,6 +65,13 @@ public class QueueService : IQueueService
         foreach (var message in deadLetterMessages)
         {
             var resubmittableMessage = new ServiceBusMessage(message);
+            
+            if (createNewMessageId)
+                        {
+                            var newMessageId = Guid.NewGuid();
+                            resubmittableMessage.MessageId = newMessageId.ToString();
+                        }
+            
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }

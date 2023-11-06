@@ -17,6 +17,7 @@ public interface IQueueService
     public Task ResubmitDeadLetterMessages(
         string queueName,
         int fetchCount,
-        TimeSpan? maxWaitTime = null
+        TimeSpan? maxWaitTime = null,
+        bool createNewMessageId = false
     );
 }
