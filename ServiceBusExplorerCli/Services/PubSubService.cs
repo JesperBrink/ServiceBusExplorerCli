@@ -1,14 +1,13 @@
 using Azure.Messaging.ServiceBus;
-using Microsoft.Azure.ServiceBus.Management;
 using ServiceBusExplorerCli.Exceptions;
+using ServiceBusExplorerCli.Repositories.Interface;
 using ServiceBusExplorerCli.Services.Interface;
 
 namespace ServiceBusExplorerCli.Services;
 
 public class PubSubService : IPubSubService
 {
-    private readonly ServiceBusClient _serviceBusClient;
-    private readonly ManagementClient _managementClient;
+    private readonly IServiceBusRepository serviceBusRepository;
     private IDictionary<string, IReadOnlyList<string>> _topicToSubscriptions =
         new Dictionary<string, IReadOnlyList<string>>();
     private IDictionary<string, ServiceBusReceiver> _receiverLookUp =
@@ -16,10 +15,9 @@ public class PubSubService : IPubSubService
     private IDictionary<string, ServiceBusSender> _senderLookUp =
         new Dictionary<string, ServiceBusSender>();
 
-    public PubSubService(string serviceBusConnectionString)
+    public PubSubService(IServiceBusRepository serviceBusRepository)
     {
-        _serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        _managementClient = new ManagementClient(serviceBusConnectionString);
+        this.serviceBusRepository = serviceBusRepository;
     }
 
     public async Task Setup()
@@ -51,9 +49,6 @@ public class PubSubService : IPubSubService
         var receiver = GetDeadLetterReceiverOrThrow(topicName, subscriptionName);
         return await receiver.PeekMessagesAsync(noOfMessages);
     }
-    
-    // TODO: tilføj test project, hvor jeg tester de to services.
-    // Eksempel på test: test at der resubmittes korrekt (med og uden nye ID'er).
 
     public async Task ResubmitDeadLetterMessages(
         string topicName,
@@ -79,7 +74,7 @@ public class PubSubService : IPubSubService
                 var newMessageId = Guid.NewGuid();
                 resubmittableMessage.MessageId = newMessageId.ToString();
             }
-            
+
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }
@@ -132,12 +127,12 @@ public class PubSubService : IPubSubService
     {
         var topicToSubscriptions = new Dictionary<string, IReadOnlyList<string>>();
 
-        var topics = await _managementClient.GetTopicsAsync();
+        var topics = await serviceBusRepository.GetTopicsAsync();
         var topicNames = topics.Select(t => t.Path).ToList();
 
         foreach (var topicName in topicNames)
         {
-            var subscriptions = await _managementClient.GetSubscriptionsAsync(topicName);
+            var subscriptions = await serviceBusRepository.GetSubscriptionsAsync(topicName);
             var subscriptionNames = subscriptions.Select(s => s.SubscriptionName).ToList();
             topicToSubscriptions[topicName] = subscriptionNames;
         }
@@ -155,7 +150,7 @@ public class PubSubService : IPubSubService
         {
             foreach (var subscriptionName in topicToSubscriptions[topicName])
             {
-                var receiver = _serviceBusClient.CreateReceiver(topicName, subscriptionName);
+                var receiver = serviceBusRepository.CreateReceiver(topicName, subscriptionName);
                 var topicSubscriptionPath = GetTopicSubscriptionPath(topicName, subscriptionName);
                 lookUp.Add(topicSubscriptionPath, receiver);
 
@@ -163,7 +158,7 @@ public class PubSubService : IPubSubService
                     topicName,
                     subscriptionName
                 );
-                var deadLetterReceiver = _serviceBusClient.CreateReceiver(
+                var deadLetterReceiver = serviceBusRepository.CreateReceiver(
                     topicSubscriptionDeadLetterPath
                 );
                 lookUp.Add(topicSubscriptionDeadLetterPath, deadLetterReceiver);
@@ -181,7 +176,7 @@ public class PubSubService : IPubSubService
 
         foreach (var topicName in topicToSubscriptions.Keys)
         {
-            var sender = _serviceBusClient.CreateSender(topicName);
+            var sender = serviceBusRepository.CreateSender(topicName);
             lookUp.Add(topicName, sender);
         }
 

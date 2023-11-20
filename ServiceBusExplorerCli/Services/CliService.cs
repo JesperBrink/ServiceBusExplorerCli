@@ -1,6 +1,9 @@
+using Azure.Messaging.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using ServiceBusExplorerCli.Commands;
 using ServiceBusExplorerCli.Commands.Interface;
 using ServiceBusExplorerCli.Models;
+using ServiceBusExplorerCli.Repositories;
 using ServiceBusExplorerCli.Services.Interface;
 using ServiceBusExplorerCli.Util;
 
@@ -34,10 +37,15 @@ public class CliService : ICliService
 
     private async Task<IReadOnlyList<ICommand>> IntializeCommands(ConnectionConfig connectionConfig)
     {
-        var queueService = new QueueService(connectionConfig.ConnectionString);
+        var serviceBusRepository = new ServiceBusRepository(
+            new ServiceBusClient(connectionConfig.ConnectionString),
+            new ManagementClient(connectionConfig.ConnectionString)
+        );
+
+        var queueService = new QueueService(serviceBusRepository);
         await queueService.Setup();
 
-        var pubSubService = new PubSubService(connectionConfig.ConnectionString);
+        var pubSubService = new PubSubService(serviceBusRepository);
         await pubSubService.Setup();
 
         return new List<ICommand>

@@ -1,24 +1,23 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using ServiceBusExplorerCli.Exceptions;
+using ServiceBusExplorerCli.Repositories.Interface;
 using ServiceBusExplorerCli.Services.Interface;
 
 namespace ServiceBusExplorerCli.Services;
 
 public class QueueService : IQueueService
 {
-    private readonly ServiceBusClient _serviceBusClient;
-    private readonly ManagementClient _managementClient;
+    private readonly IServiceBusRepository _serviceBusRepository;
     private IReadOnlyList<string> _queueNames = new List<string>();
     private IDictionary<string, ServiceBusReceiver> _receiverLookUp =
         new Dictionary<string, ServiceBusReceiver>();
     private IDictionary<string, ServiceBusSender> _senderLookUp =
         new Dictionary<string, ServiceBusSender>();
 
-    public QueueService(string serviceBusConnectionString)
+    public QueueService(IServiceBusRepository serviceBusRepository)
     {
-        _serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
-        _managementClient = new ManagementClient(serviceBusConnectionString);
+        _serviceBusRepository = serviceBusRepository;
     }
 
     public async Task Setup()
@@ -65,13 +64,13 @@ public class QueueService : IQueueService
         foreach (var message in deadLetterMessages)
         {
             var resubmittableMessage = new ServiceBusMessage(message);
-            
+
             if (createNewMessageId)
-                        {
-                            var newMessageId = Guid.NewGuid();
-                            resubmittableMessage.MessageId = newMessageId.ToString();
-                        }
-            
+            {
+                var newMessageId = Guid.NewGuid();
+                resubmittableMessage.MessageId = newMessageId.ToString();
+            }
+
             await sender.SendMessageAsync(resubmittableMessage);
             await receiver.CompleteMessageAsync(message);
         }
@@ -116,7 +115,7 @@ public class QueueService : IQueueService
 
     private async Task<IReadOnlyList<string>> RetrieveQueueNames()
     {
-        var queues = await _managementClient.GetQueuesAsync();
+        var queues = await _serviceBusRepository.GetQueuesAsync();
         return queues.Select(q => q.Path).ToList();
     }
 
@@ -126,13 +125,11 @@ public class QueueService : IQueueService
 
         foreach (var queue in queues)
         {
-            var options = new ServiceBusReceiverOptions();
-
-            var receiver = _serviceBusClient.CreateReceiver(queue, options);
+            var receiver = _serviceBusRepository.CreateReceiver(queue);
             lookUp.Add(queue, receiver);
 
             var deadLetterQueue = GetDeadLetterQueuePath(queue);
-            var deadLetterReceiver = _serviceBusClient.CreateReceiver(deadLetterQueue, options);
+            var deadLetterReceiver = _serviceBusRepository.CreateReceiver(deadLetterQueue);
             lookUp.Add(deadLetterQueue, deadLetterReceiver);
         }
 
@@ -145,7 +142,7 @@ public class QueueService : IQueueService
 
         foreach (var queue in queues)
         {
-            var sender = _serviceBusClient.CreateSender(queue);
+            var sender = _serviceBusRepository.CreateSender(queue);
             lookUp.Add(queue, sender);
         }
 
