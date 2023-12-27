@@ -17,6 +17,11 @@ public class PubSubServiceTests
         _serviceBusRepository = new Mock<IServiceBusRepository>();
         _uut = new PubSubService(_serviceBusRepository.Object);
     }
+    
+    // TODO:
+    // Der er nu refactored så det burde være muligt at mocke og derved teste.
+    // Næste step er derfor at lave testene i denne fil.
+    // Derefter, lav lignende tests for QueueService.
 
     [Fact]
     public async Task Setup_InitiatesTopicAndSubscriptionNames()
